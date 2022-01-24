@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls import url
 
 from rest_framework import routers
 
@@ -22,13 +23,27 @@ from client.urls import router as clientrouter
 from proprio.urls import router as propriorouter
 from login import views
 
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
 router = routers.DefaultRouter()
 router.registry.extend(clientrouter.registry)
 
 routerpro = routers.DefaultRouter()
 routerpro.registry.extend(propriorouter.registry)
 
-
+schema_view = get_schema_view(
+   openapi.Info(
+      title="Resi API",
+      default_version='v1',
+      description="ceci est la documentation du backend du projet RESI",
+      contact=openapi.Contact(email="lopezkouakou15@gmail.com"),
+      license=openapi.License(name="BSD License"),
+   ),
+   public=False,
+   permission_classes=[permissions.AllowAny],
+)
 
 urlpatterns = [
     path('', views.index),
@@ -36,9 +51,12 @@ urlpatterns = [
     path('client/', include(router.urls)),
     path('proprio/', include(routerpro.urls)),
     path('login/client/', views.client_login),
-    path('login/proprio/', views.client_login),
+    path('login/proprio/', views.proprio_login),
     path('moyenneresi/', views.resi_note),
     path('dj-rest-auth/', include('dj_rest_auth.urls')),
+    url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
 
 

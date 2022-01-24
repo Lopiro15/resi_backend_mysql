@@ -1,5 +1,8 @@
 from proprio.models import Proprietaire
 from proprio.serializers import ProprietaireSerializer
+from .serializers import *
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -26,10 +29,13 @@ def index(request):
     return Response(context)
 
 
+
+
+@swagger_auto_schema(method='post', request_body=LoginClientSerializer, responses={201: ClientSerializer})
 @api_view(['POST'])
+
 @permission_classes([IsAuthenticated])
 def client_login(request, format=None):
-    permission_classes = (IsAuthenticated, )
     try:
         client = Client.objects.get(username__exact=request.data['username'])
     except Client.DoesNotExist:
@@ -40,6 +46,9 @@ def client_login(request, format=None):
             return Response(ClientSerializer(client).data, status=status.HTTP_201_CREATED)
         return Response({"error": "password is wrong", "echec": True},status=status.HTTP_404_NOT_FOUND)
 
+
+
+@swagger_auto_schema(method='post', request_body=LoginClientSerializer, responses={201: ProprietaireSerializer})
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def proprio_login(request, format=None):
@@ -53,6 +62,9 @@ def proprio_login(request, format=None):
             return Response(ProprietaireSerializer(proprio).data, status=status.HTTP_201_CREATED)
         return Response({"error": "password is wrong", "echec": True},status=status.HTTP_404_NOT_FOUND)
 
+
+@swagger_auto_schema(method='get', responses={201: MoyenneResiSerializer})
+@swagger_auto_schema(method='post', request_body=MoyenneSerializer, responses={201: MoyenneResiSerializer})
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def resi_note(request, format=None):
