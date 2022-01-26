@@ -7,7 +7,7 @@ class Proprietaire(models.Model):
     nom = models.CharField(null=False, max_length=25)
     prenoms = models.CharField(null=False, max_length=75)
     phone = models.CharField(null=False, max_length=10)
-    photo = models.ImageField(upload_to ='proprio/image/')
+    photo = models.ImageField(upload_to ='proprio/image/', null=True)
     username = models.CharField(null=False, max_length=255, unique=True)
     password = models.CharField(null=False, max_length=255)
     

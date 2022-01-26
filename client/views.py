@@ -19,7 +19,7 @@ class ClienViewSet(viewsets.ModelViewSet):
         if not request.POST._mutable:
             request.POST._mutable = True
         request.POST['password'] = make_password(request.POST['password'], salt=None, hasher='default')
-        serializer = ClientSerializer(data=request.POST)
+        serializer = ClientSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
