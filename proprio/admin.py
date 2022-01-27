@@ -15,7 +15,7 @@ class ResiAdmin(admin.ModelAdmin):
     list_filter = ('idproprio', 'ville', 'quartier', 'prix', 'disponibilité')
     
 @admin.register(Historiqueresi)
-class ProprioAdmin(admin.ModelAdmin):
+class HistoriqueAdmin(admin.ModelAdmin):
     
-    list_display = ('id', 'date', 'idresidence', 'idclient', 'duredesejour', 'visite3D', 'residencecommandé')
+    list_display = ('id', 'date', 'idresidence', 'idclient', 'tempssurannonce', 'visite3D', 'residencecommandé')
     list_filter = ('idresidence', 'idclient', 'visite3D')

@@ -21,3 +21,10 @@ class MoyenneResiSerializer(serializers.Serializer):
     photocouverture = serializers.CharField(max_length=200)
     nbvote = serializers.IntegerField()
     moyenne = serializers.FloatField()
+    
+class Historiquemoyenresi(serializers.Serializer):
+    idresidence = serializers.CharField(max_length=200)
+    nbvisite3D = serializers.IntegerField()
+    nbcommandeissu = serializers.IntegerField()
+    nbvisitetotal = serializers.IntegerField()
+    moyennetemps = serializers.FloatField()

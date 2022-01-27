@@ -28,6 +28,6 @@ class Historiqueresi(models.Model):
     date = models.DateField(auto_now_add=True)
     idresidence = models.CharField(null=False, max_length=255)
     idclient = models.CharField(null=False, max_length=255)
-    duredesejour = models.IntegerField(null=False)
+    tempssurannonce = models.IntegerField(null=False)
     visite3D = models.BooleanField(default=False)
     residencecommandé = models.BooleanField(default=True)

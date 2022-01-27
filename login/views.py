@@ -25,6 +25,7 @@ def index(request):
         'login_proprietaire' : '/login/proprio/',
         'proprietaire' : '/proprio/',
         'residenceetmoyenne' : '/moyenneresi/',
+        'historiquevisitemoyenne' : '/historiquemoyenresi/',
     }
     return Response(context)
 
@@ -89,3 +90,23 @@ def resi_note(request, format=None):
             for obj in rows:
                 json_data.append({"idresidence" : obj[0], "idproprio" : obj[1], "description" : obj[2], "ville" : obj[3], "quartier" : obj[4], "prix" : obj[5], "disponibilité" : obj[6], "photocouverture" : obj[7], "nbvote" : obj[8], "moyenne" : obj[9]})
         return Response(json_data, status=status.HTTP_201_CREATED)
+
+
+@swagger_auto_schema(method='get', responses={201: Historiquemoyenresi})
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def historique_annonce(request, Format=None):
+    with connection.cursor() as cursor:
+        sql1 = "CREATE VIEW IF NOT EXISTS annonce3D AS SELECT idresidence, COUNT(tempssurannonce) as nbvisite3D FROM proprio_historiqueresi WHERE  visite3D = 1 GROUP BY idresidence"
+        cursor.execute(sql1)
+        sql2 = "CREATE VIEW IF NOT EXISTS annoncecommande AS SELECT idresidence, COUNT(tempssurannonce) as nbcommande FROM proprio_historiqueresi WHERE residencecommandé = 1 GROUP BY idresidence"
+        cursor.execute(sql2)
+        json_data = []
+        sql= "SELECT proprio_historiqueresi.idresidence, annonce3D.nbvisite3D, annoncecommande.nbcommande, COUNT(tempssurannonce) as nbvisite, AVG(tempssurannonce) as moyenne FROM proprio_historiqueresi, annonce3D, annoncecommande WHERE proprio_historiqueresi.idresidence = annonce3D.idresidence AND proprio_historiqueresi.idresidence = annoncecommande.idresidence GROUP BY proprio_historiqueresi.idresidence ORDER BY moyenne"
+        cursor.execute(sql)
+        rows = cursor.fetchall()
+        for row in rows:
+            json_data.append({"idresidence" : row[0], "nbvisite3D" : row[1], "nbcommandeissu" : row[2], "nbvisitetotal" : row[3], "moyennetemps" : row[4]})
+    return Response(json_data, status=status.HTTP_201_CREATED)
+        
+        
