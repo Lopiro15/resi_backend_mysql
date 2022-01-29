@@ -10,7 +10,7 @@ from client.serializers import AjoutSerializer, ClientSerializer, CommandeSerial
 
 
 # Create your views here.
-class ClienViewSet(viewsets.ModelViewSet):
+class ClientViewSet(viewsets.ModelViewSet):
     queryset = Client.objects.all()
     serializer_class = ClientSerializer
     permission_classes = (IsAuthenticated, )
@@ -25,7 +25,7 @@ class ClienViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def update(self, request, *args, **kwargs):
+    def partial_update(self, request, *args, **kwargs):
         try:
             client = Client.objects.get(pk=kwargs.get('pk'))
         except Client.DoesNotExist:
@@ -35,7 +35,7 @@ class ClienViewSet(viewsets.ModelViewSet):
             request.POST._mutable = True
         request.POST['password'] = make_password(request.POST['password'], salt=None, hasher='default')
         
-        serializer = ClientSerializer(client, data=request.POST)
+        serializer = ClientSerializer(client, data=request.POST, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)

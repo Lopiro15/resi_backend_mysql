@@ -34,7 +34,6 @@ def index(request):
 
 @swagger_auto_schema(method='post', request_body=LoginClientSerializer, responses={201: ClientSerializer})
 @api_view(['POST'])
-
 @permission_classes([IsAuthenticated])
 def client_login(request, format=None):
     try:
@@ -46,6 +45,7 @@ def client_login(request, format=None):
         if check_password(request.data['password'], client.password):
             return Response(ClientSerializer(client).data, status=status.HTTP_201_CREATED)
         return Response({"error": "password is wrong", "echec": True},status=status.HTTP_404_NOT_FOUND)
+
 
 
 

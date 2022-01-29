@@ -38,7 +38,7 @@ class ProprioViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def update(self, request, *args, **kwargs):
+    def partial_update(self, request, *args, **kwargs):
         try:
             proprio = Proprietaire.objects.get(pk=kwargs.get('pk'))
         except Proprietaire.DoesNotExist:
@@ -48,7 +48,7 @@ class ProprioViewSet(viewsets.ModelViewSet):
             request.POST._mutable = True
         request.POST['password'] = make_password(request.POST['password'], salt=None, hasher='default')
         
-        serializer = ProprietaireSerializer(proprio, data=request.POST)
+        serializer = ProprietaireSerializer(proprio, data=request.POST, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
