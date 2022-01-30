@@ -6,7 +6,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from django.contrib.auth.hashers import check_password
+from django.contrib.auth.hashers import check_password, make_password
 from django.db import connection
 from rest_framework.permissions import IsAuthenticated
 
@@ -23,9 +23,12 @@ def index(request):
         'client' : '/client/',
         'login_client' : '/login/client/',
         'login_proprietaire' : '/login/proprio/',
+        'change_password_client' : '/password/client/',
+        'change_password_proprietaire' : '/password/proprio/',
         'proprietaire' : '/proprio/',
         'residenceetmoyenne' : '/moyenneresi/',
         'historiquevisitemoyenne' : '/historiquemoyenresi/',
+        'documentation' : '/swagger/',
     }
     return Response(context)
 
@@ -46,6 +49,23 @@ def client_login(request, format=None):
             return Response(ClientSerializer(client).data, status=status.HTTP_201_CREATED)
         return Response({"error": "password is wrong", "echec": True},status=status.HTTP_404_NOT_FOUND)
 
+@swagger_auto_schema(method='post', request_body=PasswordchangeSerializer, responses={201: PasswordchangeresultSerializer, 404: PasswordchangeresultSerializer})
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def client_change_password(request, format=None):
+    try:
+        client = Client.objects.get(username__exact=request.data['username'])
+    except Client.DoesNotExist:
+        return Response({"msg": "username does not exist", "success": False} ,status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'POST':
+        if check_password(request.data['password'], client.password):
+            data = {"password": make_password(request.data['newpassword'], salt=None, hasher='default')}
+            serializer = ClientSerializer(client, data=data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"msg": "password changed", "success": True}, status=status.HTTP_201_CREATED)
+        return Response({"msg": "password is wrong", "success": False},status=status.HTTP_404_NOT_FOUND)
 
 
 
@@ -62,6 +82,24 @@ def proprio_login(request, format=None):
         if check_password(request.data['password'], proprio.password):
             return Response(ProprietaireSerializer(proprio).data, status=status.HTTP_201_CREATED)
         return Response({"error": "password is wrong", "echec": True},status=status.HTTP_404_NOT_FOUND)
+    
+@swagger_auto_schema(method='post', request_body=PasswordchangeSerializer, responses={201: PasswordchangeresultSerializer, 404: PasswordchangeresultSerializer})
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def proprio_change_password(request, format=None):
+    try:
+        proprio = Proprietaire.objects.get(username__exact=request.data['username'])
+    except Proprietaire.DoesNotExist:
+        return Response({"msg": "username does not exist", "success": False} ,status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'POST':
+        if check_password(request.data['password'], proprio.password):
+            data = {"password": make_password(request.data['newpassword'], salt=None, hasher='default')}
+            serializer = ProprietaireSerializer(proprio, data=data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"msg": "password changed", "success": True}, status=status.HTTP_201_CREATED)
+        return Response({"msg": "password is wrong", "success": False},status=status.HTTP_404_NOT_FOUND)
 
 
 @swagger_auto_schema(method='get', responses={201: MoyenneResiSerializer})

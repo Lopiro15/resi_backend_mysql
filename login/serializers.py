@@ -4,6 +4,15 @@ class LoginClientSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=200)
     password = serializers.CharField(max_length=200)
     
+class PasswordchangeSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=200)
+    password = serializers.CharField(max_length=200)
+    newpassword = serializers.CharField(max_length=200)
+    
+class PasswordchangeresultSerializer(serializers.Serializer):
+    msg = serializers.CharField(max_length=200)
+    success = serializers.BooleanField()
+    
 class MoyenneSerializer(serializers.Serializer):
     ville = serializers.CharField(max_length=200)
     quartier = serializers.CharField(max_length=200)

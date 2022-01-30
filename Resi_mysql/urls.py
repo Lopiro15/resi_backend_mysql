@@ -47,6 +47,8 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('', views.index),
+    path('changepassword/client/', views.client_change_password),
+    path('changepassword/proprio/', views.proprio_change_password),
     path('admin/', admin.site.urls),
     path('client/', include(router.urls)),
     path('proprio/', include(routerpro.urls)),
