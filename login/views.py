@@ -28,6 +28,7 @@ def index(request):
         'proprietaire' : '/proprio/',
         'residenceetmoyenne' : '/moyenneresi/',
         'historiquevisitemoyenne' : '/historiquemoyenresi/',
+        'disponibiliteresi' : '/disponibiliteresi/',
         'documentation' : '/swagger/',
     }
     return Response(context)
@@ -146,5 +147,18 @@ def historique_annonce(request, Format=None):
         for row in rows:
             json_data.append({"idresidence" : row[0], "nbvisite3D" : row[1], "nbcommandeissu" : row[2], "nbvisitetotal" : row[3], "moyennetemps" : row[4]})
     return Response(json_data, status=status.HTTP_201_CREATED)
-        
-        
+     
+
+@swagger_auto_schema(method='post', request_body=DisporesiSerializer, responses={201: DisporesiresultSerializer})   
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def disponibilite_resi(request, Format=None):
+    if request.method == 'POST':
+        with connection.cursor() as cursor:
+            sql = "SELECT * FROM client_commande WHERE idresidence = %(id)s AND datedebut <= %(fin)s AND datefin >= %(deb)s"
+            param = {'id': request.POST['idresidence'], 'deb': request.POST['datedebut'], 'fin': request.POST['datefin']}
+            cursor.execute(sql, params=param)
+            rows = cursor.fetchall()
+            if len(rows) > 0:
+                return Response({"msg": "résidence indisponible", "resultat": False}, status=status.HTTP_201_CREATED)
+            return Response({"msg": "résidence disponible", "resultat": True}, status=status.HTTP_201_CREATED)      

@@ -9,9 +9,18 @@ class PasswordchangeSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=200)
     newpassword = serializers.CharField(max_length=200)
     
+class DisporesiSerializer(serializers.Serializer):
+    idresidence = serializers.CharField(max_length=200)
+    datedebut = serializers.DateField()
+    datefin = serializers.DateField()
+    
 class PasswordchangeresultSerializer(serializers.Serializer):
     msg = serializers.CharField(max_length=200)
     success = serializers.BooleanField()
+    
+class DisporesiresultSerializer(serializers.Serializer):
+    msg = serializers.CharField(max_length=200)
+    resultat = serializers.BooleanField()
     
 class MoyenneSerializer(serializers.Serializer):
     ville = serializers.CharField(max_length=200)

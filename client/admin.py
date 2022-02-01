@@ -11,8 +11,8 @@ class ClientAdmin(admin.ModelAdmin):
 @admin.register(Commande)
 class CommandeAdmin(admin.ModelAdmin):
     
-    list_display = ('idclient', 'idresidence', 'prixactuel', 'dateentree', 'dureeenjour', 'versementduclient', 'cleauclient', 'versementauproprio', 'datecommande', 'statucommande')
-    list_filter = ('idclient', 'idresidence', 'dateentree', 'dureeenjour', 'datecommande', 'statucommande')
+    list_display = ('idclient', 'idresidence', 'prixactuel', 'datedebut', 'datefin', 'versementduclient', 'cleauclient', 'versementauproprio', 'datecommande', 'statucommande')
+    list_filter = ('idclient', 'idresidence', 'datedebut', 'datefin', 'datecommande', 'statucommande')
     
 @admin.register(AjoutDeSejour)
 class AjoutAdmin(admin.ModelAdmin):
