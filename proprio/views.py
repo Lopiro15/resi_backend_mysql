@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-from proprio.models import Imageresi, Proprietaire, Residence, Historiqueresi
-from proprio.serializers import ImageResiserializer, ProprietaireSerializer, Resiserializer, HistoriqueSerializer
+from proprio.models import *
+from proprio.serializers import *
 
 from django_filters import rest_framework as filters
 
@@ -14,12 +14,12 @@ class ResiFilter(filters.FilterSet):
         model = Residence
 
         fields = {
-            'prix': ['iexact', 'lte', 'gte'],
-            'idproprio': ['iexact'],
+            'prixjournalier': ['iexact', 'lte', 'gte'],
+            'idproprio': [],
             'ville': ['icontains'],
             'quartier': ['icontains'],
             'disponibilité': ['iexact'],
-            }
+        }
 
 
 # Create your views here.
@@ -61,10 +61,15 @@ class ResiViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
     filter_class = ResiFilter
     
-class ImageResiViewSet(viewsets.ModelViewSet):
-    queryset = Imageresi.objects.all()
+class PiecesResiViewSet(viewsets.ModelViewSet):
+    queryset = Piecesresi.objects.all()
     permission_classes = (IsAuthenticated, )
-    serializer_class = ImageResiserializer
+    serializer_class = PiecesResiserializer
+
+class ImagePieceResiViewSet(viewsets.ModelViewSet):
+    queryset = Imagepieceresi.objects.all()
+    permission_classes = (IsAuthenticated, )
+    serializer_class = ImagePieceResiserializer
 
 class HistoriqueViewSet(viewsets.ModelViewSet):
     queryset = Historiqueresi.objects.all()

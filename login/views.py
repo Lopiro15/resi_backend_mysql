@@ -19,17 +19,18 @@ from client.serializers import ClientSerializer
 @permission_classes([IsAuthenticated])
 def index(request):
     context = {
-        'admin' : '/admin/',
-        'client' : '/client/',
-        'login_client' : '/login/client/',
-        'login_proprietaire' : '/login/proprio/',
-        'change_password_client' : '/password/client/',
-        'change_password_proprietaire' : '/password/proprio/',
-        'proprietaire' : '/proprio/',
-        'residenceetmoyenne' : '/moyenneresi/',
-        'historiquevisitemoyenne' : '/historiquemoyenresi/',
-        'disponibiliteresi' : '/disponibiliteresi/',
-        'documentation' : '/swagger/',
+        'Page Administrateur' : '/admin/',
+        'Gestion de l\'API client' : '/client/',
+        'Connection du client' : '/login/client/',
+        'Connection du proprietaire' : '/login/proprio/',
+        'Modifier le password d\'un client' : '/changepassword/client/',
+        'Modifier le password d\'un proprietaire' : '/changepassword/proprio/',
+        'Gestion de l\'API proprietaire' : '/proprio/',
+        'Liste des residences avec leurs évaluations moyennes' : '/moyenneresi/',
+        'Historique des visites en moyenne des résidences' : '/historiquemoyenresi/',
+        'Vérifier la disponibilité d\'une residence' : '/disponibiliteresi/',
+        'Confirmer une commande': '/confirmation-commande/',
+        'Documentation' : '/swagger/',
     }
     return Response(context)
 
@@ -161,4 +162,19 @@ def disponibilite_resi(request, Format=None):
             rows = cursor.fetchall()
             if len(rows) > 0:
                 return Response({"msg": "résidence indisponible", "resultat": False}, status=status.HTTP_201_CREATED)
-            return Response({"msg": "résidence disponible", "resultat": True}, status=status.HTTP_201_CREATED)      
+            return Response({"msg": "résidence disponible", "resultat": True}, status=status.HTTP_201_CREATED)
+
+
+@swagger_auto_schema(method='post', request_body=ConfirmCommandeSerializer, responses={201: ConfirmCommanderesultSerializer})
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def confirmation_de_la_commande(request, Format=None):
+    if request.method == 'POST':
+        with connection.cursor() as cursor:
+            sql = "UPDATE client_commande SET statucommande = 'VALIDE' WHERE id = %s"
+            param = {'id': request.POST['idcommande']}
+            cursor.execute(sql, params=param)
+            sql2 = "UPDATE client_commande SET statucommande = 'ANNULE' WHERE statucommande = 'ATTENTE' AND datedebut <= %(fin)s AND datefin >= %(deb)s"
+            params = {'deb': request.POST['datedebut'], 'fin': request.POST['datefin']}
+            cursor.execute(sql2, params=params)
+            return Response({"msg": "commande confirmé", "resultat": True}, status=status.HTTP_201_CREATED)      

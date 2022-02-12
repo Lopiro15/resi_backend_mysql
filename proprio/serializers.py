@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from proprio.models import Historiqueresi, Imageresi, Proprietaire, Residence
+from proprio.models import *
 
 # Client Serializer
 class ProprietaireSerializer(serializers.ModelSerializer):
@@ -8,9 +8,15 @@ class ProprietaireSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
 
-class ImageResiserializer(serializers.ModelSerializer):
+class ImagePieceResiserializer(serializers.ModelSerializer):
     class Meta:
-        model = Imageresi
+        model = Imagepieceresi
+        fields = '__all__'
+
+class PiecesResiserializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Piecesresi
         fields = '__all__'
         
 class Resiserializer(serializers.ModelSerializer):

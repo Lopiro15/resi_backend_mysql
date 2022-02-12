@@ -14,11 +14,20 @@ class DisporesiSerializer(serializers.Serializer):
     datedebut = serializers.DateField()
     datefin = serializers.DateField()
     
+class ConfirmCommandeSerializer(serializers.Serializer):
+    idcommande = serializers.CharField(max_length=200)
+    datedebut = serializers.DateField()
+    datefin = serializers.DateField()
+    
 class PasswordchangeresultSerializer(serializers.Serializer):
     msg = serializers.CharField(max_length=200)
     success = serializers.BooleanField()
     
 class DisporesiresultSerializer(serializers.Serializer):
+    msg = serializers.CharField(max_length=200)
+    resultat = serializers.BooleanField()
+    
+class ConfirmCommanderesultSerializer(serializers.Serializer):
     msg = serializers.CharField(max_length=200)
     resultat = serializers.BooleanField()
     

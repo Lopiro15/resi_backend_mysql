@@ -98,7 +98,7 @@ WSGI_APPLICATION = 'Resi_mysql.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME' : 'db_resi',
+        'NAME' : 'resi_db',
         'USER' : 'root',
         'PASSWORD' : '',
         'HOST' : 'localhost',

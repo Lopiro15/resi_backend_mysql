@@ -14,8 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
-from django.conf.urls import url
+from django.urls import path, re_path, include
 
 from rest_framework import routers
 
@@ -49,6 +48,7 @@ urlpatterns = [
     path('', views.index),
     path('changepassword/client/', views.client_change_password),
     path('changepassword/proprio/', views.proprio_change_password),
+    path('confirmation-commande/', views.confirmation_de_la_commande),
     path('admin/', admin.site.urls),
     path('client/', include(router.urls)),
     path('proprio/', include(routerpro.urls)),
@@ -58,9 +58,9 @@ urlpatterns = [
     path('historiquemoyenresi/', views.historique_annonce),
     path('disponibiliteresi/', views.disponibilite_resi),
     path('dj-rest-auth/', include('dj_rest_auth.urls')),
-    url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
 
 
