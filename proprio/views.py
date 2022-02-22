@@ -15,10 +15,11 @@ class ResiFilter(filters.FilterSet):
 
         fields = {
             'prixjournalier': ['iexact', 'lte', 'gte'],
-            'idproprio': [],
+            'idproprio__id': ['iexact'],
             'ville': ['icontains'],
             'quartier': ['icontains'],
             'disponibilité': ['iexact'],
+            'nbpieces' : ['iexact'],
         }
 
 
