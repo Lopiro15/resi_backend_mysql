@@ -30,6 +30,7 @@ def index(request):
         'Historique des visites en moyenne des résidences' : '/historiquemoyenresi/',
         'Vérifier la disponibilité d\'une residence' : '/disponibiliteresi/',
         'Confirmer une commande': '/confirmation-commande/',
+        'La liste des commande et des residences en attente de confirmation': 'commande_en_attente/',
         'Documentation' : '/swagger/',
     }
     return Response(context)
@@ -111,7 +112,7 @@ def proprio_change_password(request, format=None):
 def resi_note(request, format=None):
     if request.method == 'GET':
         with connection.cursor() as cursor:
-            sql = "SELECT proprio_residence.*, COUNT(client_noteresidence.note) as nbvote, AVG(client_noteresidence.note) as moyenne FROM proprio_residence, client_noteresidence WHERE proprio_residence.id = client_noteresidence.idresidence GROUP BY client_noteresidence.idresidence ORDER BY moyenne;"
+            sql = "SELECT proprio_residence.*, COUNT(client_noteresidence.note) as nbvote, AVG(client_noteresidence.note) as moyenne FROM proprio_residence, client_noteresidence WHERE proprio_residence.id = client_noteresidence.idresidence_id GROUP BY client_noteresidence.idresidence_id ORDER BY moyenne;"
             cursor.execute(sql)
             rows = cursor.fetchall()
             json_data = []
@@ -120,7 +121,7 @@ def resi_note(request, format=None):
         return Response(json_data, status=status.HTTP_201_CREATED)
     elif request.method == 'POST':
         with connection.cursor() as cursor:
-            sql = "SELECT proprio_residence.*, COUNT(client_noteresidence.note) as nbvote, AVG(client_noteresidence.note) as moyenne FROM proprio_residence, client_noteresidence WHERE proprio_residence.id = client_noteresidence.idresidence AND proprio_residence.disponibilité = 1 AND proprio_residence.ville LIKE %(v)s AND proprio_residence.quartier LIKE %(q)s AND proprio_residence.prix <= %(p_lte)s AND proprio_residence.prix >= %(p_gte)s GROUP BY client_noteresidence.idresidence ORDER BY moyenne;"
+            sql = "SELECT proprio_residence.*, COUNT(client_noteresidence.note) as nbvote, AVG(client_noteresidence.note) as moyenne FROM proprio_residence, client_noteresidence WHERE proprio_residence.id = client_noteresidence.idresidence_id AND proprio_residence.disponibilité = 1 AND proprio_residence.ville LIKE %(v)s AND proprio_residence.quartier LIKE %(q)s AND proprio_residence.prix <= %(p_lte)s AND proprio_residence.prix >= %(p_gte)s GROUP BY client_noteresidence.idresidence_id ORDER BY moyenne;"
             ville = "%" + request.POST['ville'] + "%"
             quartier = "%" + request.POST['quartier'] + "%"
             param = {'v': ville, 'q': quartier, 'p_lte': request.POST['prix_lte'], 'p_gte': request.POST['prix_gte']}
@@ -142,7 +143,7 @@ def historique_annonce(request, Format=None):
         sql2 = "CREATE VIEW IF NOT EXISTS annoncecommande AS SELECT idresidence, COUNT(tempssurannonce) as nbcommande FROM proprio_historiqueresi WHERE residencecommandé = 1 GROUP BY idresidence"
         cursor.execute(sql2)
         json_data = []
-        sql= "SELECT proprio_historiqueresi.idresidence, annonce3D.nbvisite3D, annoncecommande.nbcommande, COUNT(tempssurannonce) as nbvisite, AVG(tempssurannonce) as moyenne FROM proprio_historiqueresi, annonce3D, annoncecommande WHERE proprio_historiqueresi.idresidence = annonce3D.idresidence AND proprio_historiqueresi.idresidence = annoncecommande.idresidence GROUP BY proprio_historiqueresi.idresidence ORDER BY moyenne"
+        sql= "SELECT proprio_historiqueresi.idresidence_id, annonce3D.nbvisite3D, annoncecommande.nbcommande, COUNT(tempssurannonce) as nbvisite, AVG(tempssurannonce) as moyenne FROM proprio_historiqueresi, annonce3D, annoncecommande WHERE proprio_historiqueresi.idresidence_id = annonce3D.idresidence_id AND proprio_historiqueresi.idresidence_id = annoncecommande.idresidence_id GROUP BY proprio_historiqueresi.idresidence_id ORDER BY moyenne"
         cursor.execute(sql)
         rows = cursor.fetchall()
         for row in rows:
@@ -177,4 +178,20 @@ def confirmation_de_la_commande(request, Format=None):
             sql2 = "UPDATE client_commande SET statucommande = 'ANNULE' WHERE statucommande = 'ATTENTE' AND datedebut <= %(fin)s AND datefin >= %(deb)s"
             params = {'deb': request.POST['datedebut'], 'fin': request.POST['datefin']}
             cursor.execute(sql2, params=params)
-            return Response({"msg": "commande confirmé", "resultat": True}, status=status.HTTP_201_CREATED)      
+            return Response({"msg": "commande confirmé", "resultat": True}, status=status.HTTP_201_CREATED)
+        
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def commande_en_attente_de_confirmation(request, Format=None):
+    if request.method == 'POST':
+        with connection.cursor() as cursor:
+            sql = "SELECT proprio_residence.*, client_commande.prixactuel, client_commande.datedebut, client_commande.datefin, client_commande.datecommande FROM proprio_residence, client_commande WHERE client_commande.statucommande = 'ATTENTE' AND proprio_residence.id = client_commande.idresidence_id AND proprio_residence.idproprio_id = %s ORDER BY client_commande.datecommande DESC"
+            param = {'id': request.POST['idproprio']}
+            cursor.execute(sql, params=param)
+            rows = cursor.fetchall()
+            json_data = []
+            for obj in rows:
+                json_data.append({"id": obj[0], "nbpiece": obj[1], "description": obj[2], "ville": obj[3], "quartier": obj[4], "prix_journalier": obj[5], "disponibilité": obj[6], "photo_couverture": obj[7], "date": obj[8], "idproprio": obj[9], "prixactuel": obj[10], "date_debut": obj[11], "date_fin": obj[12], "datecommande": obj[13]})
+            return Response(json_data, status=status.HTTP_201_CREATED)
+      

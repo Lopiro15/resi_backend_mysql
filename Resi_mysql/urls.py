@@ -57,6 +57,7 @@ urlpatterns = [
     path('moyenneresi/', views.resi_note),
     path('historiquemoyenresi/', views.historique_annonce),
     path('disponibiliteresi/', views.disponibilite_resi),
+    path('commande_en_attente/', views.commande_en_attente_de_confirmation),
     path('dj-rest-auth/', include('dj_rest_auth.urls')),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
