@@ -44,12 +44,7 @@ schema_view = get_schema_view(
    permission_classes=[permissions.AllowAny],
 )
 
-#function test pour verifier que je peux capturer une erreur en production
-def trigger_error(request):
-    division_by_zero = 1 / 0
-
 urlpatterns = [
-    path('sentry-debug/', trigger_error), #chemin de test
     path('', views.index),
     path('changepassword/client/', views.client_change_password),
     path('changepassword/proprio/', views.proprio_change_password),
