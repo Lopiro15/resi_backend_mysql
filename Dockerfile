@@ -5,11 +5,6 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip 
 
-#On démarre ensuite un environnement de virtuel
-RUN apt-get install virtualenv
-RUN virtualenv env -p python3
-RUN env/bin/activate
-
 #On installe les dépendances nécessaires au projet et on copie dans /code
 RUN mkdir /code
 WORKDIR /code

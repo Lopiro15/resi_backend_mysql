@@ -4,7 +4,7 @@ services:
   db:
     image: mysql
     volumes:
-      - db_data_resi:/var/lib/mysql
+      - ./db_data_resi:/var/lib/mysql
     restart: always  
     environment:
       MYSQL_ROOT_PASSWORD: Freedev2020@mysql
