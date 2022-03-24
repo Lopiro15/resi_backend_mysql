@@ -1,0 +1,22 @@
+version: "3.8"
+   
+services:
+  db:
+    image: mysql
+    volumes:
+      - db_data_resi:/var/lib/mysql
+    restart: always  
+    environment:
+      MYSQL_ROOT_PASSWORD: Freedev2020@mysql
+      MYSQL_DATABASE: resi_db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+  web:
+    build: .
+    command: /home/server/resi_mysql/env/bin/gunicorn Resi_mysql.wsgi:application
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
