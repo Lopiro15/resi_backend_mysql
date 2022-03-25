@@ -29,7 +29,8 @@ services:
       MYSQL_DATABASE: root # database name
       MYSQL_ROOT_Password: Freedev2020@mysql # database password
     volumes:
-      - ./production_mode/mysql/my.cnf:/etc/mysql/my.cnf  #Mount profile
+      - ./production_mode/mysql/data/:/var/lib/mysql #Mount database data
+      - ./production_mode/mysql/conf/my.cnf:/etc/mysql/my.cnf  #Mount profile
     ports:
       - "3307:3306"
     restart: always
