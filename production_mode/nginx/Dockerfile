@@ -5,4 +5,4 @@ RUN rm /etc/nginx/conf.d/default.conf \
 && mkdir -p /usr/share/nginx/html/static
 
 #Add profile
-ADD ./nginx/nginx.conf /etc/nginx/conf.d/
+ADD ./nginx.conf /etc/nginx/conf.d/
