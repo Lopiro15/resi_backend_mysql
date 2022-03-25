@@ -26,7 +26,7 @@ services:
   db:
     image: mysql:5.7
     environment:
-      - MYSQL_DATABASE: django # database name
+      - MYSQL_DATABASE: root # database name
       - MYSQL_ROOT_Password: Freedev2020@mysql # database password
     volumes:
       - ./production_mode/mysql/my.cnf:/etc/mysql/my.cnf  #Mount profile
@@ -53,7 +53,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    xpose:
+    expose:
       - "8000"
     volumes:
       - ./static:/usr/share/nginx/html/static # mount static files
