@@ -52,7 +52,7 @@ services:
   nginx:
     build: production_mode/nginx
     ports:
-      - "81:80"
+      - "80:80"
       - "443:443"
     expose:
       - "8000"
