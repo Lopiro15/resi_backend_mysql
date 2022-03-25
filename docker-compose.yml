@@ -26,8 +26,8 @@ services:
   db:
     image: mysql:5.7
     environment:
-      - MYSQL_DATABASE: root # database name
-      - MYSQL_ROOT_Password: Freedev2020@mysql # database password
+      MYSQL_DATABASE: root # database name
+      MYSQL_ROOT_Password: Freedev2020@mysql # database password
     volumes:
       - ./production_mode/mysql/my.cnf:/etc/mysql/my.cnf  #Mount profile
     ports:
