@@ -59,7 +59,7 @@ services:
     volumes:
       - ./static:/usr/share/nginx/html/static # mount static files
     links:
-      - web
+      - web:web
     depends_on:
       - web
     restart: always
