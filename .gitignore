@@ -1,2 +1,2 @@
 env/*
-Resi_mysql/settings/production.py
+Resi_mysql/production.py
