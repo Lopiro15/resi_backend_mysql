@@ -100,8 +100,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME' : 'resi_db',
         'USER' : 'root',
-        'PASSWORD' : '',
-        'HOST' : 'localhost',
+        'PASSWORD' : 'Freedev2020@mysql',
+        'HOST' : '127.0.0.1',
     }
 }
 
