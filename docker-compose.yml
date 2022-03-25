@@ -31,7 +31,7 @@ services:
     volumes:
       - ./production_mode/mysql/my.cnf:/etc/mysql/my.cnf  #Mount profile
     ports:
-      - "3306:3306"
+      - "3307:3306"
     restart: always
 
   web:
