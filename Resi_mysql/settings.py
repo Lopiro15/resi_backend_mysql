@@ -101,7 +101,7 @@ DATABASES = {
         'NAME' : 'resi_db',
         'USER' : 'root',
         'PASSWORD' : 'Freedev2020@mysql',
-        'HOST' : 'localhost',
+        'HOST' : 'db',
     }
 }
 

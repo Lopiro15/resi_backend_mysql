@@ -12,9 +12,9 @@ import os
 from django.core.wsgi import get_wsgi_application
 
 #For developpment mode
-# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Resi_mysql.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Resi_mysql.settings')
 
 #For production mode
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Resi_mysql.production')
+#os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Resi_mysql.production')
 
 application = get_wsgi_application()
