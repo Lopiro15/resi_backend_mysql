@@ -1,22 +1,64 @@
-version: "3.8"
+# version: "3"
    
+# services:
+#   db:
+#     image: mysql
+#     volumes:
+#       - ./db_data_resi:/var/lib/mysql
+#     restart: always  
+#     environment:
+#       MYSQL_ROOT_PASSWORD: Freedev2020@mysql
+#       MYSQL_DATABASE: resi_db
+#       MYSQL_USER: django
+#   web:
+#     build: .
+#     command: gunicorn Resi_mysql.wsgi:application
+#     volumes:
+#       - .:/code
+#     ports:
+#       - "8000:8000"
+#     depends_on:
+#       - db
+
+version: "3"
+
 services:
   db:
-    image: mysql
-    volumes:
-      - ./db_data_resi:/var/lib/mysql
-    restart: always  
+    image: mysql:5.7
     environment:
-      MYSQL_ROOT_PASSWORD: Freedev2020@mysql
-      MYSQL_DATABASE: resi_db
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
+      - MYSQL_DATABASE: django # database name
+      - MYSQL_ROOT_Password: Freedev2020@mysql # database password
+    volumes:
+      - ./production_mode/mysql/my.cnf:/etc/mysql/my.cnf  #Mount profile
+    ports:
+      - "3306:3306"
+    restart: always
+
   web:
     build: .
-    command: /home/server/resi_mysql/env/bin/gunicorn Resi_mysql.wsgi:application
+    expose:
+      - "8000"
     volumes:
       - .:/code
-    ports:
-      - "8000:8000"
+      - /tmp/logs:/tmp
+    command: bash start.sh
+    links:
+      - db
     depends_on:
       - db
+    restart: always
+
+  nginx:
+    build: production_mode/nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    xpose:
+      - "8000"
+    volumes:
+      - ./static:/usr/share/nginx/html/static # mount static files
+    links:
+      - web
+    depends_on:
+      - web
+    restart: always
