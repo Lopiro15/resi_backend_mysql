@@ -31,10 +31,11 @@ services:
     volumes:
       - ./production_mode/mysql/data/:/var/lib/mysql #Mount database data
       - ./production_mode/mysql/conf/my.cnf:/etc/mysql/my.cnf  #Mount profile
+      - ./production_mode/mysql/init:/docker-entrypoint-initdb.d/ #mount data to initialize SQL script
     ports:
       - "3307:3306"
     restart: always
-
+s
   web:
     build: .
     expose:
