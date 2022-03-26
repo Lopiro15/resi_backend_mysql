@@ -23,10 +23,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-b+v$=ved5bz+%r5$_(96&03o(57!yj&yl7sb0&z&d+-%q4nou*'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+#For Developpment mode
+#DEBUG = True
+
+#ALLOWED_HOSTS = []
+
+#For production mode
+DEBUG = False
 
 ALLOWED_HOSTS = ['192.168.1.12']
-
 
 # Application definition
 
@@ -95,6 +100,7 @@ WSGI_APPLICATION = 'Resi_mysql.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+#For production mode
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -105,6 +111,16 @@ DATABASES = {
     }
 }
 
+#For developpement mode
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.mysql',
+#        'NAME' : 'resi_db',
+#        'USER' : 'root',
+#        'PASSWORD' : '',
+#        'HOST' : 'localhost',
+#    }
+#}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
