@@ -43,6 +43,7 @@ services:
     volumes:
       - .:/code
       - /tmp/logs:/tmp
+      - /etc/config.json:/etc/config.json
     command: bash start.sh
     links:
       - db
