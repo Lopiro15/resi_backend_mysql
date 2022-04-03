@@ -6,10 +6,10 @@ class Proprietaire(models.Model):
     nom = models.CharField(null=False, max_length=25)
     prenoms = models.CharField(null=False, max_length=75)
     phone = models.CharField(null=False, max_length=10)
-    photo = models.ImageField(upload_to ='proprio/image/profile/', null=True)
+    photo = models.ImageField(upload_to ='image/profile/', null=True)
     username = models.CharField(null=False, max_length=255, unique=True)
     user_id = user_id = models.ForeignKey('User.CustomUser', null=True, on_delete=models.CASCADE)
-    piece_identite = models.ImageField(upload_to ='proprio/image/profile/', null=True)
+    piece_identite = models.ImageField(upload_to ='image/profile/', null=True)
     isactivate = models.BooleanField(default=False)
     date = models.DateTimeField(auto_now_add=True)
     
@@ -21,7 +21,7 @@ class Residence(models.Model):
     quartier = models.CharField(null=False, max_length=100)
     prixjournalier = models.IntegerField(null=False)
     disponibilite = models.BooleanField(default=True)
-    photocouverture = models.ImageField(upload_to ='proprio/image/resi/', null=True)
+    photocouverture = models.ImageField(upload_to ='image/resi/', null=True)
     date = models.DateTimeField(auto_now_add=True)
     
 
@@ -31,7 +31,7 @@ class Piecesresi(models.Model):
 
 class Imagepieceresi(models.Model):
     idpiece = models.ForeignKey(Piecesresi, null=False, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to ='proprio/image/resi/')
+    image = models.ImageField(upload_to ='image/resi/')
     
 class Historiqueresi(models.Model):
     date = models.DateTimeField(auto_now_add=True)

@@ -130,11 +130,11 @@ def historique_resis(Format=None, **kwargs):
 @permission_classes([IsAuthenticated])
 def confirmation_de_la_commande(request, Format=None, **kwargs):
    with connection.cursor() as cursor:
-        sql = "UPDATE client_commande SET statucommande = 'VALIDE' WHERE id = %s"
+        sql = "UPDATE client_commande SET statucommande = 'VALIDE' WHERE id = %(id)s"
         param = {'id': kwargs['idcommande']}
         cursor.execute(sql, params=param)
-        sql2 = "UPDATE client_commande SET statucommande = 'ANNULE' WHERE statucommande = 'ATTENTE' AND datedebut <= %(fin)s AND datefin >= %(deb)s"
-        params = {'deb': kwargs['datedebut'], 'fin': kwargs['datefin']}
+        sql2 = "UPDATE client_commande SET statucommande = 'ANNULE' WHERE statucommande = 'ATTENTE' AND idresidence_id = %(idresidence)s AND datedebut <= %(fin)s AND datefin >= %(deb)s"
+        params = {'idresidence': kwargs['idresidence'], 'deb': kwargs['datedebut'], 'fin': kwargs['datefin']}
         cursor.execute(sql2, params=params)
         return Response({"msg": "commande confirmé", "resultat": True}, status=status.HTTP_201_CREATED)
 
