@@ -5,4 +5,8 @@ pillow
 django-filter==2.4.0
 dj-rest-auth
 drf-yasg
+<<<<<<< HEAD
 requests
+=======
+gunicorn
+>>>>>>> 4cc71eac9684719c88009ec2da2384cc9aee6c0a
