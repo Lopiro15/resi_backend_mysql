@@ -37,74 +37,6 @@ def index(request):
 
 
 
-
-@swagger_auto_schema(method='post', request_body=LoginClientSerializer, responses={201: ClientSerializer})
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def client_login(request, format=None):
-    try:
-        client = Client.objects.get(username__exact=request.data['username'])
-    except Client.DoesNotExist:
-        return Response({"error": "username does not exist", "echec": True} ,status=status.HTTP_404_NOT_FOUND)
-    
-    if request.method == 'POST':
-        if check_password(request.data['password'], client.password):
-            return Response(ClientSerializer(client).data, status=status.HTTP_201_CREATED)
-        return Response({"error": "password is wrong", "echec": True},status=status.HTTP_404_NOT_FOUND)
-
-@swagger_auto_schema(method='post', request_body=PasswordchangeSerializer, responses={201: PasswordchangeresultSerializer, 404: PasswordchangeresultSerializer})
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def client_change_password(request, format=None):
-    try:
-        client = Client.objects.get(username__exact=request.data['username'])
-    except Client.DoesNotExist:
-        return Response({"msg": "username does not exist", "success": False} ,status=status.HTTP_404_NOT_FOUND)
-    
-    if request.method == 'POST':
-        if check_password(request.data['password'], client.password):
-            data = {"password": make_password(request.data['newpassword'], salt=None, hasher='default')}
-            serializer = ClientSerializer(client, data=data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response({"msg": "password changed", "success": True}, status=status.HTTP_201_CREATED)
-        return Response({"msg": "password is wrong", "success": False},status=status.HTTP_404_NOT_FOUND)
-
-
-
-@swagger_auto_schema(method='post', request_body=LoginClientSerializer, responses={201: ProprietaireSerializer})
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def proprio_login(request, format=None):
-    try:
-        proprio = Proprietaire.objects.get(username__exact=request.data['username'])
-    except Proprietaire.DoesNotExist:
-        return Response({"error": "username does not exist", "echec": True} ,status=status.HTTP_404_NOT_FOUND)
-    
-    if request.method == 'POST':
-        if check_password(request.data['password'], proprio.password):
-            return Response(ProprietaireSerializer(proprio).data, status=status.HTTP_201_CREATED)
-        return Response({"error": "password is wrong", "echec": True},status=status.HTTP_404_NOT_FOUND)
-    
-@swagger_auto_schema(method='post', request_body=PasswordchangeSerializer, responses={201: PasswordchangeresultSerializer, 404: PasswordchangeresultSerializer})
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def proprio_change_password(request, format=None):
-    try:
-        proprio = Proprietaire.objects.get(username__exact=request.data['username'])
-    except Proprietaire.DoesNotExist:
-        return Response({"msg": "username does not exist", "success": False} ,status=status.HTTP_404_NOT_FOUND)
-    
-    if request.method == 'POST':
-        if check_password(request.data['password'], proprio.password):
-            data = {"password": make_password(request.data['newpassword'], salt=None, hasher='default')}
-            serializer = ProprietaireSerializer(proprio, data=data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response({"msg": "password changed", "success": True}, status=status.HTTP_201_CREATED)
-        return Response({"msg": "password is wrong", "success": False},status=status.HTTP_404_NOT_FOUND)
-
-
 @swagger_auto_schema(method='get', responses={201: MoyenneResiSerializer})
 @swagger_auto_schema(method='post', request_body=MoyenneSerializer, responses={201: MoyenneResiSerializer})
 @api_view(['GET', 'POST'])
@@ -151,47 +83,94 @@ def historique_annonce(request, Format=None):
     return Response(json_data, status=status.HTTP_201_CREATED)
      
 
-@swagger_auto_schema(method='post', request_body=DisporesiSerializer, responses={201: DisporesiresultSerializer})   
-@api_view(['POST'])
+@swagger_auto_schema(method='get', request_body=DisporesiSerializer, responses={201: DisporesiresultSerializer})   
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def disponibilite_resi(request, Format=None):
-    if request.method == 'POST':
-        with connection.cursor() as cursor:
-            sql = "SELECT * FROM client_commande WHERE idresidence = %(id)s AND datedebut <= %(fin)s AND datefin >= %(deb)s"
-            param = {'id': request.POST['idresidence'], 'deb': request.POST['datedebut'], 'fin': request.POST['datefin']}
-            cursor.execute(sql, params=param)
-            rows = cursor.fetchall()
-            if len(rows) > 0:
-                return Response({"msg": "résidence indisponible", "resultat": False}, status=status.HTTP_201_CREATED)
-            return Response({"msg": "résidence disponible", "resultat": True}, status=status.HTTP_201_CREATED)
+def disponibilite_une_resi(Format=None, **kwargs):
+    with connection.cursor() as cursor:
+        sql = "SELECT proprio_residence.*, client_commande.prixactuel, client_commande.datedebut, client_commande.datefin, client_commande.datecommande FROM client_commande, proprio_residence WHERE client_commande.statucommande = 'VALIDE' AND proprio_residence.id = client_commande.idresidence_id AND proprio_residence.id = %(idresi)s AND (client_commande.datedebut > %(fin)s OR client_commande.datefin < %(deb)s)"
+        param = {'idresi': kwargs['idresidence'], 'deb': kwargs['datedebut'], 'fin': kwargs['datefin']}
+        cursor.execute(sql, params=param)
+        rows = cursor.fetchall()
+        json_data = []
+        for row in rows:
+            json_data.append({"id": row[0], "nbpiece": row[1], "description": row[2], "ville": row[3], "quartier": row[4], "prix_journalier": row[5], "disponibilité": row[6], "photo_couverture": row[7], "date": row[8], "idproprio": row[9], "nbcommande": row[10]})
+        return Response(json_data, status=status.HTTP_201_CREATED)
 
-
-@swagger_auto_schema(method='post', request_body=ConfirmCommandeSerializer, responses={201: ConfirmCommanderesultSerializer})
-@api_view(['POST'])
+@swagger_auto_schema(method='get', request_body=DisporesiSerializer, responses={201: DisporesiresultSerializer})   
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def confirmation_de_la_commande(request, Format=None):
-    if request.method == 'POST':
-        with connection.cursor() as cursor:
-            sql = "UPDATE client_commande SET statucommande = 'VALIDE' WHERE id = %s"
-            param = {'id': request.POST['idcommande']}
-            cursor.execute(sql, params=param)
-            sql2 = "UPDATE client_commande SET statucommande = 'ANNULE' WHERE statucommande = 'ATTENTE' AND datedebut <= %(fin)s AND datefin >= %(deb)s"
-            params = {'deb': request.POST['datedebut'], 'fin': request.POST['datefin']}
-            cursor.execute(sql2, params=params)
-            return Response({"msg": "commande confirmé", "resultat": True}, status=status.HTTP_201_CREATED)
-        
+def disponibilite_resis(Format=None, **kwargs):
+    with connection.cursor() as cursor:
+        sql = "SELECT proprio_residence.*, client_commande.prixactuel, client_commande.datedebut, client_commande.datefin, client_commande.datecommande FROM client_commande, proprio_residence WHERE client_commande.statucommande = 'VALIDE' AND proprio_residence.id = client_commande.idresidence_id AND (client_commande.datedebut > %(fin)s OR client_commande.datefin < %(deb)s)"
+        param = {'deb': kwargs['datedebut'], 'fin': kwargs['datefin'], 'idproprio': kwargs['idproprio']}
+        cursor.execute(sql, params=param)
+        rows = cursor.fetchall()
+        json_data = []
+        for row in rows:
+            json_data.append({"id": row[0], "nbpiece": row[1], "description": row[2], "ville": row[3], "quartier": row[4], "prix_journalier": row[5], "disponibilité": row[6], "photo_couverture": row[7], "date": row[8], "idproprio": row[9], "nbcommande": row[10]})
+        return Response(json_data, status=status.HTTP_201_CREATED)
 
-@api_view(['POST'])
+@swagger_auto_schema(method='get', request_body=DisporesiSerializer, responses={201: DisporesiresultSerializer})   
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def commande_en_attente_de_confirmation(request, Format=None):
-    if request.method == 'POST':
-        with connection.cursor() as cursor:
-            sql = "SELECT proprio_residence.*, client_commande.prixactuel, client_commande.datedebut, client_commande.datefin, client_commande.datecommande FROM proprio_residence, client_commande WHERE client_commande.statucommande = 'ATTENTE' AND proprio_residence.id = client_commande.idresidence_id AND proprio_residence.idproprio_id = %s ORDER BY client_commande.datecommande DESC"
-            param = {'id': request.POST['idproprio']}
+def historique_resis(Format=None, **kwargs):
+    with connection.cursor() as cursor:
+        sql = "SELECT proprio_residence.*, client_commande.prixactuel, client_commande.datedebut, client_commande.datefin, client_commande.datecommande FROM client_commande, proprio_residence WHERE client_commande.statucommande = 'VALIDE' AND proprio_residence.id = client_commande.idresidence_id AND (client_commande.datedebut <= %(fin)s AND client_commande.datefin >= %(deb)s)"
+        param = {'deb': kwargs['datedebut'], 'fin': kwargs['datefin'], 'idproprio': kwargs['idproprio']}
+        cursor.execute(sql, params=param)
+        rows = cursor.fetchall()
+        json_data = []
+        for row in rows:
+            json_data.append({"id": row[0], "nbpiece": row[1], "description": row[2], "ville": row[3], "quartier": row[4], "prix_journalier": row[5], "disponibilité": row[6], "photo_couverture": row[7], "date": row[8], "idproprio": row[9], "nbcommande": row[10]})
+        return Response(json_data, status=status.HTTP_201_CREATED)
+
+@swagger_auto_schema(method='get', request_body=ConfirmCommandeSerializer, responses={201: ConfirmCommanderesultSerializer})
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def confirmation_de_la_commande(request, Format=None, **kwargs):
+   with connection.cursor() as cursor:
+        sql = "UPDATE client_commande SET statucommande = 'VALIDE' WHERE id = %s"
+        param = {'id': kwargs['idcommande']}
+        cursor.execute(sql, params=param)
+        sql2 = "UPDATE client_commande SET statucommande = 'ANNULE' WHERE statucommande = 'ATTENTE' AND datedebut <= %(fin)s AND datefin >= %(deb)s"
+        params = {'deb': kwargs['datedebut'], 'fin': kwargs['datefin']}
+        cursor.execute(sql2, params=params)
+        return Response({"msg": "commande confirmé", "resultat": True}, status=status.HTTP_201_CREATED)
+
+@swagger_auto_schema(method='get', request_body=ConfirmCommandeSerializer, responses={201: ConfirmCommanderesultSerializer})
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def annulation_de_la_commande(request, Format=None, **kwargs):
+    with connection.cursor() as cursor:
+            sql = "UPDATE client_commande SET statucommande = 'ANNULE' WHERE id = %s"
+            param = {'id': kwargs['idcommande']}
             cursor.execute(sql, params=param)
+            return Response({"msg": "commande confirmé", "resultat": True}, status=status.HTTP_201_CREATED)   
+
+@permission_classes([IsAuthenticated])
+@api_view(['GET'])
+def commande_en_attente_de_confirmation(request, Format=None,  **kwargs):
+    with connection.cursor() as cursor:
+            sql = "SELECT proprio_residence.*, client_commande.prixactuel, client_commande.datedebut, client_commande.datefin, client_commande.datecommande, client_client.* FROM proprio_residence, client_commande, client_client WHERE client_commande.statucommande = 'ATTENTE' AND proprio_residence.id = client_commande.idresidence_id AND client_commande.idclient_id = client_client.id AND proprio_residence.idproprio_id = %(id)s ORDER BY client_commande.datecommande DESC;"
+            param = {'id': kwargs['pk']}
+            cursor.execute(sql=sql, params=param)
             rows = cursor.fetchall()
             json_data = []
-            for obj in rows:
-                json_data.append({"id": obj[0], "nbpiece": obj[1], "description": obj[2], "ville": obj[3], "quartier": obj[4], "prix_journalier": obj[5], "disponibilité": obj[6], "photo_couverture": obj[7], "date": obj[8], "idproprio": obj[9], "prixactuel": obj[10], "date_debut": obj[11], "date_fin": obj[12], "datecommande": obj[13]})
+            for row in rows:
+                json_data.append({"id": row[0], "nbpiece": row[1], "description": row[2], "ville": row[3], "quartier": row[4], "prix_journalier": row[5], "disponibilité": row[6], "photo_couverture": row[7], "date": row[8], "idproprio": row[9], "prixactuel": row[10], "date_debut": row[11], "date_fin": row[12], "datecommande": row[13], "idclient": row[13], "nom_client": row[14], "prenoms_client": row[15], "phone": row[16]})
+            return Response(json_data, status=status.HTTP_201_CREATED)
+
+@permission_classes([IsAuthenticated])        
+@api_view(['GET'])
+def resi_commande_en_attente(request, Format=None,  **kwargs):
+    with connection.cursor() as cursor:
+            sql = "SELECT proprio_residence.*, COUNT(client_commande.prixactuel) as nbcommande FROM proprio_residence, client_commande WHERE client_commande.statucommande = 'ATTENTE' AND proprio_residence.id = client_commande.idresidence_id AND proprio_residence.idproprio_id = %(id)s GROUP BY proprio_residence.id ORDER BY client_commande.datecommande DESC;"
+            param = {'id': kwargs['pk']}
+            cursor.execute(sql=sql, params=param)
+            rows = cursor.fetchall()
+            json_data = []
+            for row in rows:
+                json_data.append({"id": row[0], "nbpiece": row[1], "description": row[2], "ville": row[3], "quartier": row[4], "prix_journalier": row[5], "disponibilité": row[6], "photo_couverture": row[7], "date": row[8], "idproprio": row[9], "nbcommande": row[10]})
             return Response(json_data, status=status.HTTP_201_CREATED)
       

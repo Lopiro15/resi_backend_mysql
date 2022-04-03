@@ -11,7 +11,7 @@ class Client(models.Model):
     phone = models.CharField(null=False, max_length=10)
     photo = models.ImageField(upload_to ='client/image/', null=True)
     username = models.CharField(null=False, max_length=255, unique=True)
-    password = models.CharField(null=False, max_length=255)
+    user_id = models.ForeignKey('User.CustomUser', null=True, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
     
 class Commande(models.Model):

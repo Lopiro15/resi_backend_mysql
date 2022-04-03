@@ -31,8 +31,8 @@ class ProprioAdmin(admin.ModelAdmin):
 @admin.register(Residence)
 class ResiAdmin(admin.ModelAdmin):
     
-    list_display = ('id', 'idproprio', 'descriptifresidence', 'ville', 'quartier', 'prixjournalier', 'disponibilité', 'photocouverture', 'date')
-    list_filter = ('idproprio', 'ville', 'quartier', 'prixjournalier', 'disponibilité')
+    list_display = ('id', 'idproprio', 'descriptifresidence', 'ville', 'quartier', 'prixjournalier', 'disponibilite', 'photocouverture', 'date')
+    list_filter = ('idproprio', 'ville', 'quartier', 'prixjournalier', 'disponibilite')
     inlines = (PieceInline, CommandeInline, NoteInline, HistoriqueresiInline)
     
 @admin.register(Piecesresi)

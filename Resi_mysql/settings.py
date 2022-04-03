@@ -45,7 +45,13 @@ INSTALLED_APPS = [
     'proprio',
     'login',
     'django_filters',
+    'User',
+    'allauth',
+    'allauth.account',
+    'dj_rest_auth.registration',
 ]
+
+AUTH_USER_MODEL = 'User.CustomUser'
 
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS' : [
@@ -147,3 +153,9 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = 'username'
+
+SITE_ID = 1
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

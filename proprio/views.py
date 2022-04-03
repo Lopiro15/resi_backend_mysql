@@ -3,6 +3,7 @@ from django.contrib.auth.hashers import make_password
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+import requests
 
 from proprio.models import *
 from proprio.serializers import *
@@ -18,7 +19,7 @@ class ResiFilter(filters.FilterSet):
             'idproprio__id': ['iexact'],
             'ville': ['icontains'],
             'quartier': ['icontains'],
-            'disponibilité': ['iexact'],
+            'disponibilite': ['iexact'],
             'nbpieces' : ['iexact'],
         }
 
@@ -29,32 +30,7 @@ class ProprioViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, )
     serializer_class = ProprietaireSerializer
     
-    def create(self, request, *args, **kwargs):
-        if not request.POST._mutable:
-            request.POST._mutable = True
-        request.POST['password'] = make_password(request.POST['password'], salt=None, hasher='default')
-        serializer = ProprietaireSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def partial_update(self, request, *args, **kwargs):
-        try:
-            proprio = Proprietaire.objects.get(pk=kwargs.get('pk'))
-        except Proprietaire.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        
-        if not request.POST._mutable:
-            request.POST._mutable = True
-        request.POST['password'] = make_password(request.POST['password'], salt=None, hasher='default')
-        
-        serializer = ProprietaireSerializer(proprio, data=request.POST, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class ResiViewSet(viewsets.ModelViewSet):
     queryset = Residence.objects.all()
@@ -66,15 +42,17 @@ class PiecesResiViewSet(viewsets.ModelViewSet):
     queryset = Piecesresi.objects.all()
     permission_classes = (IsAuthenticated, )
     serializer_class = PiecesResiserializer
+    filterset_fields = ['idresidence__id']
 
 class ImagePieceResiViewSet(viewsets.ModelViewSet):
     queryset = Imagepieceresi.objects.all()
     permission_classes = (IsAuthenticated, )
     serializer_class = ImagePieceResiserializer
+    filterset_fields = ['idpiece__id']
 
 class HistoriqueViewSet(viewsets.ModelViewSet):
     queryset = Historiqueresi.objects.all()
     serializer_class = HistoriqueSerializer
     permission_classes = (IsAuthenticated, )
-    filterset_fields = ['idclient', 'idresidence']
+    filterset_fields = ['idclient__id', 'idresidence__id']
     

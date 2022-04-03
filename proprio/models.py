@@ -8,7 +8,7 @@ class Proprietaire(models.Model):
     phone = models.CharField(null=False, max_length=10)
     photo = models.ImageField(upload_to ='proprio/image/profile/', null=True)
     username = models.CharField(null=False, max_length=255, unique=True)
-    password = models.CharField(null=False, max_length=255)
+    user_id = user_id = models.ForeignKey('User.CustomUser', null=True, on_delete=models.CASCADE)
     piece_identite = models.ImageField(upload_to ='proprio/image/profile/', null=True)
     isactivate = models.BooleanField(default=False)
     date = models.DateTimeField(auto_now_add=True)
@@ -20,7 +20,7 @@ class Residence(models.Model):
     ville = models.CharField(null=False, max_length=100)
     quartier = models.CharField(null=False, max_length=100)
     prixjournalier = models.IntegerField(null=False)
-    disponibilité = models.BooleanField(default=True)
+    disponibilite = models.BooleanField(default=True)
     photocouverture = models.ImageField(upload_to ='proprio/image/resi/', null=True)
     date = models.DateTimeField(auto_now_add=True)
     

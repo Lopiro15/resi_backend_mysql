@@ -1,0 +1,6 @@
+creer un custom user model
+utiliser l'id comme clé etrangère pour client ou proprio
+creer le rgisterserializer https://www.rootstrap.com/blog/registration-and-authentication-in-django-apps-with-dj-rest-auth/
+revoir le prix dans commande faire en sorte que ce soit automatique et juste
+comparer les dates de debut et fin pour pas d'incohérence
+
