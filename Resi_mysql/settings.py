@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 #!/usr/bin/env python
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,20 +22,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: don't run with debug turned on in production!
 #For Developpment mode
-# SECRET_KEY = 'django-insecure-b+v$=ved5bz+%r5$_(96&03o(57!yj&yl7sb0&z&d+-%q4nou*'
+SECRET_KEY = 'django-insecure-b+v$=ved5bz+%r5$_(96&03o(57!yj&yl7sb0&z&d+-%q4nou*'
 
-#DEBUG = True
+DEBUG = True
 
-#ALLOWED_HOSTS = []
+ALLOWED_HOSTS = []
 
 #For production mode
-import json
-with open('/etc/config.json') as config_file:
-    config = json.load(config_file)
+#import json
+#with open('/etc/config.json') as config_file:
+#    config = json.load(config_file)
 
-SECRET_KEY = config['SECRET_KEY']
-DEBUG = False
-ALLOWED_HOSTS = ['192.168.1.13']
+#SECRET_KEY = config['SECRET_KEY']
+#DEBUG = False
+#ALLOWED_HOSTS = ['192.168.1.13']
 
 # Application definition
 
@@ -110,26 +111,26 @@ WSGI_APPLICATION = 'Resi_mysql.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 #For production mode
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME' : 'resi_db',
-        'USER' : 'root',
-        'PASSWORD' : 'Freedev2020@mysql',
-        'HOST' : 'db',
-    }
-}
-
-#For developpement mode
 #DATABASES = {
 #    'default': {
 #        'ENGINE': 'django.db.backends.mysql',
 #        'NAME' : 'resi_db',
 #        'USER' : 'root',
-#        'PASSWORD' : '',
-#        'HOST' : 'localhost',
+#        'PASSWORD' : 'Freedev2020@mysql',
+#        'HOST' : 'db',
 #    }
 #}
+
+#For developpement mode
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME' : 'resi_db',
+        'USER' : 'root',
+        'PASSWORD' : '',
+        'HOST' : 'localhost',
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -178,3 +179,6 @@ ACCOUNT_AUTHENTICATION_METHOD = 'username'
 
 SITE_ID = 1
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
