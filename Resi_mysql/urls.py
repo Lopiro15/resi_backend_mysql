@@ -49,7 +49,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('', views.index),
-    path('confirmation-commande/<int:idcommande>/<int:idresidence>/<datedebut>/<datefin>', views.confirmation_de_la_commande),
+    path('confirmation-commande/<int:idcommande>', views.confirmation_de_la_commande),
     path('annulation-commande/<int:idcommande>', views.annulation_de_la_commande),
     path('admin/', admin.site.urls),
     path('client/', include(router.urls)),

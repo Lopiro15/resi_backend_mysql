@@ -129,24 +129,42 @@ def historique_resis(Format=None, **kwargs):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def confirmation_de_la_commande(request, Format=None, **kwargs):
-   with connection.cursor() as cursor:
-        sql = "UPDATE client_commande SET statucommande = 'VALIDE' WHERE id = %(id)s"
+    with connection.cursor() as cursor:
+        req = "SELECT * FROM client_commande WHERE id = %(id)s"
         param = {'id': kwargs['idcommande']}
-        cursor.execute(sql, params=param)
-        sql2 = "UPDATE client_commande SET statucommande = 'ANNULE' WHERE statucommande = 'ATTENTE' AND idresidence_id = %(idresidence)s AND datedebut <= %(fin)s AND datefin >= %(deb)s"
-        params = {'idresidence': kwargs['idresidence'], 'deb': kwargs['datedebut'], 'fin': kwargs['datefin']}
-        cursor.execute(sql2, params=params)
-        return Response({"msg": "commande confirmé", "resultat": True}, status=status.HTTP_201_CREATED)
+        cursor.execute(req, params=param)
+        rows = cursor.fetchall()
+        for row in rows:
+            debut = row[2]
+            fin = row[3]
+            resi = row[10]
+        if len(rows) > 0:
+            sql = "UPDATE client_commande SET statucommande = 'VALIDE' WHERE id = %(id)s"
+            param = {'id': kwargs['idcommande']}
+            cursor.execute(sql, params=param)
+            sql2 = "UPDATE client_commande SET statucommande = 'ANNULE' WHERE statucommande = 'ATTENTE' AND idresidence_id = %(idresidence)s AND datedebut <= %(fin)s AND datefin >= %(deb)s"
+            params = {'idresidence': resi, 'deb': debut, 'fin': fin}
+            cursor.execute(sql2, params=params)
+            return Response({"msg": "commande confirmé", "resultat": True}, status=status.HTTP_200_OK)
+        else:
+            return Response({"msg": "commande inexistante", "resultat": False}, status=status.HTTP_200_OK)
 
 @swagger_auto_schema(method='get', request_body=ConfirmCommandeSerializer, responses={201: ConfirmCommanderesultSerializer})
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def annulation_de_la_commande(request, Format=None, **kwargs):
     with connection.cursor() as cursor:
-            sql = "UPDATE client_commande SET statucommande = 'ANNULE' WHERE id = %s"
+        req = "SELECT * FROM client_commande WHERE id = %(id)s"
+        param = {'id': kwargs['idcommande']}
+        cursor.execute(req, params=param)
+        rows = cursor.fetchall()
+        if len(rows) > 0:
+            sql = "UPDATE client_commande SET statucommande = 'ANNULE' WHERE id = %(id)s"
             param = {'id': kwargs['idcommande']}
             cursor.execute(sql, params=param)
-            return Response({"msg": "commande confirmé", "resultat": True}, status=status.HTTP_201_CREATED)   
+            return Response({"msg": "commande confirmé", "resultat": True}, status=status.HTTP_200_OK)
+        else:
+            return Response({"msg": "commande inexistante", "resultat": False}, status=status.HTTP_200_OK)  
 
 @permission_classes([IsAuthenticated])
 @api_view(['GET'])
