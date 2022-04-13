@@ -18,12 +18,18 @@ from django.contrib import admin
 from django.urls import path, re_path, include
 from django.conf.urls.static import static
 from django.conf import settings
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
 
 from rest_framework import routers
 
 from client.urls import router as clientrouter
 from proprio.urls import router as propriorouter
 from login import views
+from User import views as user
 
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -56,13 +62,16 @@ urlpatterns = [
     path('proprio/', include(routerpro.urls)),
     path('moyenneresi/', views.resi_note),
     path('historiquemoyenresi/', views.historique_annonce),
+    re_path(r'^register', user.RegisterView.as_view()),
+    re_path(r'^login', user.LoginView.as_view()),
+    re_path(r'^logout', user.LogoutView.as_view()),
     path('disponibilite_une_resi/<datedebut>/<datefin>/<int:idresidence>', views.disponibilite_une_resi),
     path('disponibilite_des_residences/<datedebut>/<datefin>/<int:idproprio>/', views.disponibilite_resis),
     path('historique_des_residences/<datedebut>/<datefin>/<int:idproprio>/', views.historique_resis),
     path('commande_en_attente/<int:pk>', views.commande_en_attente_de_confirmation),
-    re_path(r'^dj-rest-auth/registration/', include('dj_rest_auth.registration.urls')),
     path('resi_commande_en_attente/<int:pk>', views.resi_commande_en_attente),
-    path('dj-rest-auth/', include('dj_rest_auth.urls')),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
